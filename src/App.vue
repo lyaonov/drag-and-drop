@@ -2,7 +2,7 @@
 import TheInput from './components/TheInput.vue';
 import TheBoard from './components/TheBoard.vue'
 import { ref, computed } from 'vue';
-import { useSelectListStore,itemsStore } from "./store/state";
+import { useSelectListStore, itemsStore } from "./store/state";
 import initialCards from './initialCards'
 
 
@@ -50,9 +50,11 @@ const customers = computed(() => allNamesItems.list);
 }
 
 h1 {
-  font-size: 30px;
-  font-family: Roboto;
-  font-weight: 500;
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 108%;
 }
 
 header {
@@ -61,15 +63,23 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* margin-bottom: 0px; */
 }
 
 .symbol {
+  font-family: 'Times New Roman', Times, serif;
+  font-weight: 700;
   color: blue;
-  font-size: 30px;
+  font-size: 25px;
 
 }
 
 .btn {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 108%;
   margin: auto 5px;
   font-weight: 900;
   padding-left: 20px;

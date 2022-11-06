@@ -4,7 +4,8 @@
   <div class="card-scene">
     <Container orientation="vertical" @drop="onColumnDrop($event)" drag-handle-selector=".column-drag-handle"
       @drag-start="dragStart" :drop-placeholder="upperDropPlaceholderOptions">
-      <Draggable v-for="column in scene.children" :key="column.id">
+      <Draggable v-for="column in scene.children.filter(col => col.name !== 'unselected')" :key="column.id"
+        :class="!column.isOpen ? 'activeDrag' : ''">
         <div :class="column.props.className">
           <div v-if="column.name !== 'unselected'" class="card-column-header">
             <svg @click="open(column)" :class="column.isOpen ? 'active' : ''" class="close_open" width="10" height="10"
@@ -13,6 +14,20 @@
             </svg>
             <input class="inputCategory" :class="!column.isReadOnly ? 'visibleInput' : ''" type="text"
               v-model="column.name" :readonly="column.isReadOnly" @keyup.enter="editCat(column)">
+            <p v-if="column.isReadOnly"
+              style="font-size:11px;color: #8E9CBB;position:absolute;font-weight:400px; left:350px; font-family:'Fira Sans';">
+              {{ column.description }}</p>
+
+            <div class="colors" v-if="column.name === 'Обязательные для всех' && column.isReadOnly"
+              style="positon:absolute; display:flex;">
+              <div class="color red" style="width:10px;height:10px;background: red;border-radius: 50%;"></div>
+              <div class="color yellow" style="width:10px;height:10px;background: yellow;border-radius: 50%;"></div>
+              <div class="color orange"
+                style="width:10px;height:10px;background: orange;border-radius: 50%; border: 2px solid black; box-sizing: border-box; box-shadow: 0px 5px 7px gray;">
+              </div>
+            </div>
+
+
             <div class="nav_item">
               <svg style="margin-right: 10px;" @click="editCat(column)" fill="gray" xmlns="http://www.w3.org/2000/svg"
                 x="0px" y="0px" width="14" height="14" viewBox="0 0 24 24">
@@ -46,6 +61,26 @@
                     v-model="card.data" :readonly="card.isReadOnly" @keyup.enter="editDoc(card)">
 
 
+
+                  <div class="colors colorInDoc"
+                    v-if="(card.data === 'Паспорт' || card.data === 'Трудовой договор') && card.isReadOnly"
+                    style="display:flex;">
+                    <div v-if="card.data === 'Паспорт'" class="color lblue"
+                      style="margin-left: -60px;width:10px;height:10px;background: lightblue;border-radius: 50%;"></div>
+                    <div v-if="card.data === 'Трудовой договор'" class="color blue"
+                      style="width:10px;height:10px;background: blue;border-radius: 50%;">
+                    </div>
+                    <div v-if="card.data === 'Трудовой договор'" class="color gray"
+                      style="width:10px;height:10px;background: lightgray; border-radius: 50%">
+                    </div>
+                  </div>
+                  <p style="font-size:11px;color: red;position:absolute;font-weight:500px; left:120px; margin-top: 5px; font-family:'Fira Sans';"
+                    v-if="(card.data === 'Паспорт' || card.data === 'ИНН') && card.isReadOnly">Обязательный</p>
+                  <p v-if="card.isReadOnly"
+                    style="font-size:11px;color: #8E9CBB;position:absolute;font-weight:400px; left:250px; margin-top: 5px; font-family:'Fira Sans';">
+                    {{ card.description }}</p>
+
+
                   <div class="nav_item">
                     <svg style="margin-right: 10px;" @click="editDoc(card)" fill="gray"
                       xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="14" height="14" viewBox="0 0 24 24">
@@ -73,8 +108,9 @@
         </div>
       </Draggable>
     </Container>
-    <hr v-if="scene.children.length > 1" style="margin-bottom:10px;width: 96%;">
-    <Container style="width: 96%;" group-name="col" @drop="(e) => onCardDrop(scene.children[scene.children.length - 1].id, e)"
+    <!-- <hr v-if="scene.children.length > 1" style="margin-bottom:10px;width: 96%;"> -->
+    <Container style="width: 96%;" group-name="col"
+      @drop="(e) => onCardDrop(scene.children[scene.children.length - 1].id, e)"
       @drag-start="(e) => log('drag start', e)" @drag-end="(e) => log('drag end', e)"
       :get-child-payload="getCardPayload(scene.children[scene.children.length - 1].id)" drag-class="card-ghost"
       drop-class="card-ghost-drop" :drop-placeholder="dropPlaceholderOptions"
@@ -83,6 +119,25 @@
         <div :class="card.props.className" :style="card.props.style">
           <input class=" inputDoc" :class="!card.isReadOnly ? 'visibleInput' : ''" type="text" v-model="card.data"
             :readonly="card.isReadOnly" @keyup.enter="editDoc(card)">
+          <div class="colors colorInDoc"
+            v-if="(card.data === 'Паспорт' || card.data === 'Трудовой договор') && card.isReadOnly"
+            style="display:flex;">
+            <div v-if="card.data === 'Паспорт'" class="color lblue"
+              style="margin-left: -60px;width:10px;height:10px;background: lightblue;border-radius: 50%;"></div>
+            <div v-if="card.data === 'Трудовой договор'" class="color blue"
+              style="width:10px;height:10px;background: blue;border-radius: 50%;">
+            </div>
+            <div v-if="card.data === 'Трудовой договор'" class="color gray"
+              style="width:10px;height:10px;background: lightgray;border-radius: 50%; ">
+            </div>
+          </div>
+          <p style="font-size:11px;color: red;position:absolute;font-weight:500px; left:120px; margin-top: 5px; font-family:'Fira Sans';"
+            v-if="(card.data === 'Паспорт' || card.data === 'ИНН') && card.isReadOnly">Обязательный</p>
+          <p v-if="card.isReadOnly"
+            style="font-size:11px;color: #8E9CBB;position:absolute;font-weight:400px; left:250px; margin-top: 5px; font-family:'Fira Sans';">
+            {{ card.description }}</p>
+
+
           <div class="nav_item">
             <svg style="margin-right: 10px;" @click="editDoc(card)" fill="gray" xmlns="http://www.w3.org/2000/svg"
               x="0px" y="0px" width="14" height="14" viewBox="0 0 24 24">
@@ -131,10 +186,11 @@ export default {
       },
       children: generateItems(columnNames.value.length, i => ({
         id: `column${i}`,
-        isOpen: true,
+        isOpen: i === 0 ? true : false,
         isReadOnly: true,
         type: 'container',
         name: columnNames.value[i],
+        description: columnNames.value[i] === 'Обязательные для всех' ? 'Документы, обязательные для всех сотрудников без исключения' : columnNames.value[i] === 'Обязательные для трудоустройства' ? 'Документы, без которых невозможно трудоустройство человека на какую бы то ни было должность в компании вне зависимости от граж' : '',
         props: {
           orientation: 'vertical',
           className: 'card-container'
@@ -142,6 +198,10 @@ export default {
         children: generateItems(cards.value[columnNames.value[i]].length, j => ({
           type: 'draggable',
           isReadOnly: true,
+          description: cards.value[columnNames.value[i]][j].text === "Паспорт" || cards.value[columnNames.value[i]][j].text === "ИНН"
+            ? 'Для всех'
+            : cards.value[columnNames.value[i]][j].text === "Тестовое задание для кандидата"
+              ? 'Россия, Белоруссия, Украина, администратор филиала, повар-сушист, повар-пиццмейкер, повар горячего цеха' : '',
           id: cards.value[columnNames.value[i]][j].id,
           isNeed: cards.value[columnNames.value[i]][j].id === 1 || cards.value[columnNames.value[i]][j].id === 2 ? 'Обязательный' : false,
           props: {
@@ -286,11 +346,13 @@ export default {
 
 .inputDoc {
 
-  font-family: 'Times New Roman', Times, serif;
+  font-family: 'Fira Sans';
   /* margin-left: 50px; */
   width: 35%;
-  font-size: 16px;
-  font-weight: 600;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 108%;
   border: none;
   outline: none;
 }
@@ -318,11 +380,13 @@ h4 {
 }
 
 .inputCategory {
-  font-family: Roboto;
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 108%;
   margin-left: 50px;
   width: 50%;
-  font-size: 20px;
-  font-weight: 500;
   border: none;
   outline: none;
 }
@@ -366,7 +430,9 @@ h4 {
 }
 
 .card-scene {
-  padding-left: 50px;
+  max-width: 1210px;
+  min-width: 1205px;
+  margin-left: 50px;
   /* background-color: #fff; */
 }
 
@@ -388,17 +454,20 @@ h4 {
   /* border: 1px solid #ccc; */
   background-color: white;
   border: 1px solid lightgray;
-  padding: 10px;
+  padding: 5px;
+  padding-left: 10px;
+
 }
 
 .card-column-header {
+  background: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 20px;
   white-space: nowrap;
   border: 1px solid lightgray;
-  padding: 15px;
+  padding: 10px;
 }
 
 .column-drag-handle {
@@ -478,5 +547,30 @@ h4 {
   background-color: rgba(150, 150, 200, 0.1);
   border: 1px dashed #abc;
   margin: 5px 45px 5px 5px;
+}
+
+.activeDrag {
+  height: 65px;
+}
+
+.color {
+  margin: 0 3px;
+}
+
+.colorInDoc {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* border: 1px solid black; */
+  position: absolute;
+  margin-left: -100px;
+  height: 25px;
+}
+
+
+.colors {
+  /* margin-top: 6px; */
+  position: absolute;
+  left: 250px;
 }
 </style>

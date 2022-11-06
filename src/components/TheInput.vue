@@ -12,7 +12,7 @@
             <div class="options" v-show="visible">
                 <ul>
                     <li v-for="( match, index ) in matches" :key="match[filterby]"
-                        :class="{ 'selected': (selected == index) }" @click="itemClicked(index)"
+                        :class="{ 'selected': (selected == index) }" @click="itemClicked(index,match[filterby])"
                         v-text="match[filterby]">
                     </li>
                 </ul>
@@ -36,14 +36,15 @@ export default {
         toggleVisible() {
             this.visible = !this.visible
         },
-        itemClicked(index) {
+        itemClicked(index, match) {
             this.selected = index;
+            this.query = match;
             this.selectItem();
         },
         selectItem() {
             this.selectedItem = this.matches[this.selected]
             this.visible = false
-            this.query = ''
+            // this.query = ''
         }
     },
     computed: {
@@ -60,6 +61,10 @@ export default {
 </script>
 
 <style scoped>
+* {
+    font-family: "Fira Sans";
+}
+
 .input {
     margin-top: 29px;
     position: relative;
@@ -76,7 +81,11 @@ input:focus {
 }
 
 input {
+    font-family: 'Fira Sans';
+    font-style: normal;
+    font-weight: 500;
     font-size: 15px;
+    line-height: 108%;
     padding-bottom: 3px;
     padding-left: 35px;
     height: 100%;
@@ -126,8 +135,8 @@ input {
 }
 
 .options ul li:hover {
-    background: grey;
-    color: #fff;
-    font-weight: 600;
+    background: lightgrey;
+    /* color: #fff; */
+    font-weight: 500;
 }
 </style>
